@@ -10,7 +10,6 @@ Adafruit_NeoPixel pixels(PIX_NUM, PIN_PIXS, NEO_GRB + NEO_KHZ800);
 
 void setup() {
   Serial.begin(115200);
-  Serial1.begin(115200, SERIAL_8N1, 41, 42); // UART1: RX=GPIO46, TX=GPIO47
   delay(500);
   pixels.begin();
   pixels.clear();
@@ -34,22 +33,26 @@ void setup() {
 }
 
 void loop() {
-  //// 拍照测试：每 5 秒拍一张
-  //String path = capturePhoto();
-  //if (path.length() > 0) {
-  //  Serial.printf("照片已保存: %s\n", path.c_str());
-  //} else {
-  //  Serial.println("拍照失败！");
-  //}
-//
-  //// LED 指示：拍照时闪蓝灯
-  //pixels.setPixelColor(0, pixels.Color(0, 0, 255));
-  //pixels.show();
-  //delay(500);
-  //pixels.clear();
-  //pixels.show();
-//
-  Serial.println("Hello, RoboTrack!");
-  Serial1.println("HHHHello, RoboTrack!");
-  delay(500);
+  static int count = 0;
+  Serial.println("Test USB Serial. Count: " + String(count));
+  count++;
+
+  // LED 闪烁提示
+  pixels.setPixelColor(0, pixels.Color(255, 0, 0)); // 红色
+  pixels.show();
+
+  String photoPath = capturePhoto();
+  if (photoPath.length() > 0) {
+    Serial.println("拍照成功，保存路径: " + photoPath);
+  } else {
+    Serial.println("拍照失败！");
+  }
+
+  delay(200);
+
+
+
+  pixels.clear();
+  pixels.show();
+  delay(200);
 }

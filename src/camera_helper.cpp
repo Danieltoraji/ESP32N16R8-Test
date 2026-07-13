@@ -27,8 +27,18 @@ bool cameraInit() {
   Serial.println("  摄像头 + SD 卡初始化中...");
   Serial.println("========================================");
 
-  // 初始化摄像头（自动检测 ESP32-S3-CAM 板子配置）
-  Result camResult = camera.begin();
+  // ---- 高画质 AprilTag 追踪配置 ----
+  // UXGA(1600x1200) + JPEG质量5 + Staged DMA + 2缓冲
+  // 注：Direct DMA 在 OV2640 UXGA 下持续拍照不稳定，改用 Staged
+  Config config = Config::Balanced();
+  config.frameSize    = FrameSize::UXGA;   // 1600x1200（OV2640 上限）
+  config.jpegQuality  = 5;                 // 0-63，越小画质越高
+  config.frameBuffers = 2;                 // 2缓冲，稳定可靠
+
+  Serial1.println("相机配置: UXGA 1600x1200, JPEG Q5, Staged DMA, 2缓冲");
+
+  // 初始化摄像头（使用高画质配置）
+  Result camResult = camera.begin(config);
   if (!camResult) {
     Serial.print("[错误] 摄像头初始化失败: ");
     Serial.println(camResult.message());
