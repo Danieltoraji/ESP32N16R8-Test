@@ -5,8 +5,11 @@
 // 板载 NeoPixel RGB LED
 #define PIN_PIXS   48   // GPIO48
 #define PIX_NUM    1    // 1 颗 LED
+#define ViberationInput 42   // GPIO42，振动传感器输入
 
 Adafruit_NeoPixel pixels(PIX_NUM, PIN_PIXS, NEO_GRB + NEO_KHZ800);
+volatile int vibrationState;
+int count = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -30,29 +33,23 @@ void setup() {
 
   // 初始化摄像头和 SD 卡
   cameraInit();
+
+  pinMode(ViberationInput, INPUT);//浮空输入
 }
 
 void loop() {
-  static int count = 0;
-  Serial.println("Test USB Serial. Count: " + String(count));
+  // 读取振动传感器状态
+  vibrationState = digitalRead(ViberationInput);
+  Serial.printf("振动开关状态: %d,计数：%d\n", vibrationState,count);
   count++;
-
-  // LED 闪烁提示
-  pixels.setPixelColor(0, pixels.Color(255, 0, 0)); // 红色
-  pixels.show();
-
-  String photoPath = capturePhoto();
-  if (photoPath.length() > 0) {
-    Serial.println("拍照成功，保存路径: " + photoPath);
-  } else {
-    Serial.println("拍照失败！");
-  }
-
-  delay(200);
-
-
-
-  pixels.clear();
-  pixels.show();
-  delay(200);
+  delay(5);
 }
+
+
+
+//String photoPath = capturePhoto();
+//  if (photoPath.length() > 0) {
+//    Serial.println("拍照成功，保存路径: " + photoPath);
+//  } else {
+//    Serial.println("拍照失败！");
+//  }
